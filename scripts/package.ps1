@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
-    [string]$Version = '0.1.0.0'
+    [string]$Version = '0.1.0.0',
+    [switch]$SkipBuild
 )
 
 $ErrorActionPreference = 'Stop'
@@ -12,18 +13,39 @@ $releaseDirectory = Join-Path $repositoryRoot 'artifacts\release'
 $fileName = "Jellyfin.Plugin.PotPlayerBridge_$Version.zip"
 $zipPath = Join-Path $releaseDirectory $fileName
 
-dotnet restore $solution
-dotnet test $solution -c Release --no-restore --nologo
-dotnet publish $project -c Release --no-restore --nologo -o $publishDirectory
+if (-not $SkipBuild) {
+    dotnet restore $solution
+    dotnet test $solution -c Release --no-restore --nologo
+    dotnet publish $project -c Release --no-restore --nologo -o $publishDirectory
+}
 
 New-Item -ItemType Directory -Force -Path $releaseDirectory | Out-Null
 if (Test-Path -LiteralPath $zipPath) {
     Remove-Item -LiteralPath $zipPath -Force
 }
 
-Compress-Archive `
-    -Path (Join-Path $publishDirectory 'Jellyfin.Plugin.PotPlayerBridge.dll') `
-    -DestinationPath $zipPath
+$dllPath = Join-Path $publishDirectory 'Jellyfin.Plugin.PotPlayerBridge.dll'
+$archive = [System.IO.Compression.ZipFile]::Open(
+    $zipPath,
+    [System.IO.Compression.ZipArchiveMode]::Create)
+try {
+    $entry = $archive.CreateEntry(
+        'Jellyfin.Plugin.PotPlayerBridge.dll',
+        [System.IO.Compression.CompressionLevel]::Optimal)
+    $entry.LastWriteTime = [DateTimeOffset]::new(1980, 1, 1, 0, 0, 0, [TimeSpan]::Zero)
+    $source = [System.IO.File]::OpenRead($dllPath)
+    $destination = $entry.Open()
+    try {
+        $source.CopyTo($destination)
+    }
+    finally {
+        $destination.Dispose()
+        $source.Dispose()
+    }
+}
+finally {
+    $archive.Dispose()
+}
 
 $md5 = (Get-FileHash -LiteralPath $zipPath -Algorithm MD5).Hash.ToLowerInvariant()
 $sha256 = (Get-FileHash -LiteralPath $zipPath -Algorithm SHA256).Hash.ToLowerInvariant()

@@ -31,16 +31,7 @@ jobs:
 
       - name: Package
         shell: pwsh
-        run: |
-          $release = Join-Path $PWD 'artifacts\release'
-          New-Item -ItemType Directory -Force -Path $release | Out-Null
-          $fileName = "Jellyfin.Plugin.PotPlayerBridge_$env:PLUGIN_VERSION.zip"
-          $zip = Join-Path $release $fileName
-          Compress-Archive -Path '.\artifacts\publish\Jellyfin.Plugin.PotPlayerBridge.dll' -DestinationPath $zip -Force
-          $md5 = (Get-FileHash -LiteralPath $zip -Algorithm MD5).Hash.ToLowerInvariant()
-          $sha256 = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
-          Set-Content -LiteralPath "$zip.md5" -Value "$md5  $fileName" -Encoding utf8NoBOM
-          Set-Content -LiteralPath "$zip.sha256" -Value "$sha256  $fileName" -Encoding utf8NoBOM
+        run: .\scripts\package.ps1 -Version $env:PLUGIN_VERSION -SkipBuild
 
       - name: Upload release package
         uses: actions/upload-artifact@v4
