@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "c4d4d73d-4d70-4dce-8b62-9e5cf7c8c2a4",
+    "name": "PotPlayer Bridge",
+    "description": "Launch PotPlayer from Jellyfin Web using secure, expiring, item-scoped original-file streams.",
+    "overview": "Play Jellyfin library files in PotPlayer without a userscript or companion application.",
+    "owner": "babyYaoyuan",
+    "category": "General",
+    "versions": [
+      {
+        "version": "0.1.0.0",
+        "changelog": "Initial public release with Jellyfin Web button injection, Chromium 130+ protocol compatibility, bounded expiring stream tickets, client-address binding, and HTTP Range original-file streaming.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/babyYaoyuan/jellyfin-plugin-potplayer-bridge/releases/download/v0.1.0.0/Jellyfin.Plugin.PotPlayerBridge_0.1.0.0.zip",
+        "checksum": "28a6f5ff71edb733d999c6497a8c2933",
+        "timestamp": "2026-08-22T07:10:00Z"
+      }
+    ]
+  }
+]
