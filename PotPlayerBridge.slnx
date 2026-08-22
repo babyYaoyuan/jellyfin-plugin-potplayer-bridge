@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/Jellyfin.Plugin.PotPlayerBridge/Jellyfin.Plugin.PotPlayerBridge.csproj" />
+  <Project Path="tests/Jellyfin.Plugin.PotPlayerBridge.Tests/Jellyfin.Plugin.PotPlayerBridge.Tests.csproj" />
+</Solution>

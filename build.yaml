@@ -1,0 +1,19 @@
+---
+name: "PotPlayer Bridge"
+guid: "c4d4d73d-4d70-4dce-8b62-9e5cf7c8c2a4"
+version: "0.1.0.0"
+targetAbi: "10.11.0.0"
+framework: "net9.0"
+overview: "Launch local PotPlayer directly from Jellyfin Web."
+description: >
+  Adds a PotPlayer button to Jellyfin Web and exposes the selected local media
+  through a short-lived, item-scoped HTTP Range stream. No browser userscript
+  or companion application is required when PotPlayer has registered its
+  potplayer: protocol handler.
+category: "General"
+owner: "babyYaoyuan"
+artifacts:
+- "Jellyfin.Plugin.PotPlayerBridge.dll"
+changelog: >
+  Initial development release with Jellyfin Web button injection, expiring
+  stream tickets, IP binding, and Range-enabled original-file streaming.

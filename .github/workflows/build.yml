@@ -1,0 +1,50 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+env:
+  PLUGIN_VERSION: 0.1.0.0
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore
+        run: dotnet restore .\PotPlayerBridge.slnx
+
+      - name: Test
+        run: dotnet test .\PotPlayerBridge.slnx -c Release --no-restore --nologo
+
+      - name: Publish
+        run: dotnet publish .\src\Jellyfin.Plugin.PotPlayerBridge\Jellyfin.Plugin.PotPlayerBridge.csproj -c Release --no-restore --nologo -o .\artifacts\publish
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $release = Join-Path $PWD 'artifacts\release'
+          New-Item -ItemType Directory -Force -Path $release | Out-Null
+          $fileName = "Jellyfin.Plugin.PotPlayerBridge_$env:PLUGIN_VERSION.zip"
+          $zip = Join-Path $release $fileName
+          Compress-Archive -Path '.\artifacts\publish\Jellyfin.Plugin.PotPlayerBridge.dll' -DestinationPath $zip -Force
+          $md5 = (Get-FileHash -LiteralPath $zip -Algorithm MD5).Hash.ToLowerInvariant()
+          $sha256 = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+          Set-Content -LiteralPath "$zip.md5" -Value "$md5  $fileName" -Encoding utf8NoBOM
+          Set-Content -LiteralPath "$zip.sha256" -Value "$sha256  $fileName" -Encoding utf8NoBOM
+
+      - name: Upload release package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Jellyfin.Plugin.PotPlayerBridge-${{ env.PLUGIN_VERSION }}
+          path: artifacts/release/*
+          if-no-files-found: error

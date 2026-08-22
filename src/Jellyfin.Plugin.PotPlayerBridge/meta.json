@@ -1,0 +1,12 @@
+{
+  "category": "General",
+  "changelog": "Initial development release.",
+  "description": "Launch local PotPlayer directly from Jellyfin Web using expiring, item-scoped original-file streams.",
+  "guid": "c4d4d73d-4d70-4dce-8b62-9e5cf7c8c2a4",
+  "name": "PotPlayer Bridge",
+  "overview": "Launch PotPlayer directly from Jellyfin Web.",
+  "owner": "babyYaoyuan",
+  "targetAbi": "10.11.0.0",
+  "timestamp": "2026-08-22T00:00:00Z",
+  "version": "0.1.0.0"
+}

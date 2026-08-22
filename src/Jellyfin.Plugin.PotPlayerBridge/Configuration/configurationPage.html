@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>PotPlayer Bridge</title>
+</head>
+<body>
+<div id="PotPlayerBridgeConfigPage"
+     data-role="page"
+     class="page type-interior pluginConfigurationPage"
+     data-require="emby-input,emby-button,emby-checkbox">
+    <div data-role="content">
+        <div class="content-primary">
+            <form id="PotPlayerBridgeConfigForm">
+                <h2>PotPlayer Bridge</h2>
+                <p>
+                    Adds a PotPlayer button to Jellyfin Web video detail pages.
+                    The client must already have the <code>potplayer:</code> URL protocol registered.
+                </p>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="TicketLifetimeMinutes">
+                        Stream ticket lifetime (minutes)
+                    </label>
+                    <input id="TicketLifetimeMinutes" is="emby-input" type="number" min="5" max="1440" step="1">
+                    <div class="fieldDescription">
+                        The ticket only grants access to the selected library file. Default: 720 minutes.
+                    </div>
+                </div>
+
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label>
+                        <input id="BindTicketToRemoteAddress" is="emby-checkbox" type="checkbox">
+                        <span>Restrict each ticket to the client address that created it</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">
+                        Recommended. Disable only if a reverse proxy makes the browser and PotPlayer appear under different addresses.
+                    </div>
+                </div>
+
+                <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                    <span>Save</span>
+                </button>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function () {
+            const pluginId = 'c4d4d73d-4d70-4dce-8b62-9e5cf7c8c2a4';
+            const page = document.querySelector('#PotPlayerBridgeConfigPage');
+            const form = document.querySelector('#PotPlayerBridgeConfigForm');
+
+            page.addEventListener('pageshow', function () {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    document.querySelector('#TicketLifetimeMinutes').value = config.TicketLifetimeMinutes || 720;
+                    document.querySelector('#BindTicketToRemoteAddress').checked = config.BindTicketToRemoteAddress !== false;
+                    Dashboard.hideLoadingMsg();
+                });
+            });
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    const parsed = parseInt(document.querySelector('#TicketLifetimeMinutes').value, 10);
+                    config.TicketLifetimeMinutes = Math.min(1440, Math.max(5, Number.isFinite(parsed) ? parsed : 720));
+                    config.BindTicketToRemoteAddress = document.querySelector('#BindTicketToRemoteAddress').checked;
+                    return ApiClient.updatePluginConfiguration(pluginId, config);
+                }).then(Dashboard.processPluginConfigurationUpdateResult);
+                return false;
+            });
+        }());
+    </script>
+</div>
+</body>
+</html>
